@@ -23,7 +23,9 @@ def check_winner():
 
 
 def on_click(row, col):
-   global current_player
+   global current_player, counter
+
+   counter += 1
 
    if buttons[row][col]['text'] != "":
        return
@@ -33,7 +35,11 @@ def on_click(row, col):
    if check_winner():
        messagebox.showinfo("Игра окончена",f"Игрок {current_player} победил!")
 
+   if counter == 9:
+       messagebox.showinfo("Игра окончена", f"Ничья")
+
    current_player = "0" if current_player == "X" else "X"
+
 
 def reset_window():
     global current_player
@@ -42,6 +48,7 @@ def reset_window():
         for j in range(3):
             buttons[i][j]["text"] = ""
 
+counter = 0
 buttons = []
 for i in range(3):
     row = []
