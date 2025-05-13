@@ -35,8 +35,12 @@ def on_click(row, col):
 
    current_player = "0" if current_player == "X" else "X"
 
-def reset_click():
-    pass
+def reset_window():
+    global current_player
+    current_player = "X"
+    for i in range(3):
+        for j in range(3):
+            buttons[i][j]["text"] = ""
 
 buttons = []
 for i in range(3):
@@ -47,7 +51,7 @@ for i in range(3):
         row.append(btn)
     buttons.append(row)
 
-button = tk.Button(window, text="reset", command="")
+button = tk.Button(window, text="reset", command=reset_window)
 button.grid(row=3, column=1, pady=20)
 
 window.mainloop()
