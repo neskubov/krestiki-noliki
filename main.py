@@ -7,7 +7,6 @@ window.geometry("300x350")
 
 current_player = "X"
 
-
 def check_winner():
    for i in range(3):
        if buttons[i][0]["text"] == buttons[i][1]["text"] == buttons[i][2]["text"] != "":
@@ -36,6 +35,9 @@ def on_click(row, col):
 
    current_player = "0" if current_player == "X" else "X"
 
+def reset_click():
+    pass
+
 buttons = []
 for i in range(3):
     row = []
@@ -44,6 +46,9 @@ for i in range(3):
         btn.grid(row=i, column=j)
         row.append(btn)
     buttons.append(row)
+
+button = tk.Button(window, text="reset", command="")
+button.grid(row=3, column=1, pady=20)
 
 window.mainloop()
 
