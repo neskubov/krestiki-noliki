@@ -1,9 +1,8 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import Label, Toplevel, Radiobutton, StringVar, OptionMenu, messagebox
 
 window = tk.Tk()
 window.title("Крестики-нолики")
-
 
 # Получаем размеры экрана
 window_width = 400
@@ -18,6 +17,26 @@ window.configure(bg="lightblue")
 
 current_player = "X"
 bg_button = "#9370DB"
+
+def open_selection_window():
+    global current_player
+
+    # Создаём новое окно
+    selection_window = Toplevel(window)
+    selection_window.geometry(f"310x100+{x}+{y}")
+    selection_window.title("Выберите первого игрока")
+    selection_window.grab_set()
+
+    # Переменная для хранения выбранной опции
+    selected_players = StringVar()
+
+    # Радиокнопки
+    Radiobutton(selection_window, text=f"Начинает игрок Х", value="Х", variable="Х").pack(anchor="w")
+    Radiobutton(selection_window, text=f"Начинает игрок 0", value="0", variable="0").pack(anchor="w")
+
+    # Кнопка подтверждения
+    #Button(selection_window, text="Подтвердить", command=selection_window.destroy()).pack(pady=10)
+
 
 def check_winner():
    for i in range(3):
@@ -78,8 +97,19 @@ for i in range(3):
     window.grid_columnconfigure(i, weight=1)
     buttons.append(row)
 
+
+label = Label(window, text="Выберите, кто начинает:")
+label.grid(row=3, column=1, sticky="nsew", ipadx=20)
+
+options = ["X", "0"]
+selected_option = StringVar(value=options[0])
+select_player = OptionMenu(window, selected_option, *options)
+select_player.grid(row=4, column=1, sticky="nsew",  ipadx=20)
+current_player=selected_option.get()
+
 button = tk.Button(window, text="reset", font=("Arial", 10), command=reset_window)
-button.grid(row=3, column=1, pady=10, ipadx=20)
+button.grid(row=5, column=1, pady=10, ipadx=20, sticky="nsew")
+
 
 window.mainloop()
 
