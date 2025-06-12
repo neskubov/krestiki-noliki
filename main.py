@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import Label, Toplevel, Radiobutton, StringVar, OptionMenu, messagebox, ttk
 
+
 window = tk.Tk()
 window.title("Крестики-нолики")
 
@@ -18,6 +19,9 @@ window.configure(bg="lightblue")
 current_player = "X"
 bg_button = "#9370DB"
 
+player1_score = player2_score = 0
+wins = 3
+
 style = ttk.Style()
 style.configure("Custom.TButton",
                 font=("Arial", 8),
@@ -28,7 +32,6 @@ style.map("Custom.TButton",
 
 
 style.configure("TCombobox",
-                padding=5,
                 font=("Arial", 8))
 
 
@@ -37,7 +40,7 @@ def on_menu_select(event):
     current_player = combo.get()
 
 
-def check_winner():
+def check_winner_round():
    for i in range(3):
        if buttons[i][0]["text"] == buttons[i][1]["text"] == buttons[i][2]["text"] != "":
            return True
@@ -52,8 +55,21 @@ def check_winner():
    return False
 
 
+def update_score(player):
+    global player1_score, player2_score
+
+    if player == "X":
+        player1_score += 1
+        label_score1['text'] = player1_score
+
+    elif player == "0":
+        player2_score += 1
+        label_score2['text'] = player2_score
+
+
 def on_click(row, col):
    global current_player, counter, bg_button
+   combo.configure(state="disabled")
 
    counter += 1
 
@@ -63,13 +79,20 @@ def on_click(row, col):
    buttons[row][col]['bg'] = bg_button
    buttons[row][col]['text'] = current_player
 
-   if check_winner():
-       messagebox.showinfo("Игра окончена",f"Игрок {current_player} победил!")
+   if check_winner_round():
+       update_score(current_player)
+
+       if player1_score == wins or player2_score == wins:
+           messagebox.showinfo("Игра окончена", f"Игрок {current_player} победил!")
+           reset_window()
+           return
+
+       messagebox.showinfo("Раунд окончен",f"Раунд выиграл {current_player}")
        reset_window()
        return
 
    if counter == 9:
-       messagebox.showinfo("Игра окончена", f"Ничья")
+       messagebox.showinfo("Раунд окончен", f"Ничья")
        reset_window()
        return
 
@@ -78,7 +101,8 @@ def on_click(row, col):
 
 
 def reset_window():
-    global current_player, counter
+    global current_player, counter, player1_score, player2_score
+
     current_player = combo.get()
     counter = 0
     for i in range(3):
@@ -86,30 +110,47 @@ def reset_window():
             buttons[i][j]["text"] = ""
             buttons[i][j]["bg"] = "white"
 
+    if player1_score == wins or player2_score == wins:
+        label_score1['text'] = label_score2['text'] = "0"
+        player1_score = player2_score = 0
+        combo.configure(state="readonly")
+
+
 counter = 0
 buttons = []
 for i in range(3):
     row = []
     for j in range(3):
-        btn = tk.Button(window, text="", font=("Arial", 20), width=5, height=2, bg="white",  command=lambda r=i, c=j: on_click(r, c))
+        btn = tk.Button(window, text="", font=("Arial", 20), width=8, height=2, bg="white",  command=lambda r=i, c=j: on_click(r, c))
         btn.grid(row=i, column=j, sticky="nsew")
         window.grid_rowconfigure(j, weight=1)
         row.append(btn)
     window.grid_columnconfigure(i, weight=1)
     buttons.append(row)
 
-label = Label(window, text="Начинает:")
-label.grid(row=3, column=1, sticky="nsew")
+
+frame_options = tk.Frame(window, bg="lightblue")
+frame_options.grid(row=3, column=1, sticky="nsew")
+frame_options.grid_columnconfigure(0, weight=1)  # Настройка столбца
+
+label = Label(frame_options, text="Начинает:", bg="lightblue")
+label.grid(sticky="ew", padx=5, pady=5)
 
 options = ["X", "0"]
-combo = ttk.Combobox(window, values=options, style="TCombobox", state="readonly")
+combo = ttk.Combobox(frame_options, values=options, style="TCombobox", state="readonly")
 combo.set(options[0])  # Устанавливаем текст по умолчанию
 combo.bind("<<ComboboxSelected>>", on_menu_select)
-combo.grid(row=4, column=1, sticky="nsew")
+combo.grid(sticky="ew", padx=5, pady=5)
 
-button = ttk.Button(window, style="Custom.TButton", text="Сброс", command=reset_window)
-button.grid(row=5, column=1, pady=10,  sticky="nsew")
+button = ttk.Button(frame_options, style="Custom.TButton", text="Сброс", command=reset_window)
+button.grid(sticky="ew", padx=5, pady=10)
 
+
+label_score1 = Label(window, text=player1_score, font=("Arial", 20), bg="lightblue")
+label_score1.grid(row=3, column=0,  sticky="nsew", padx=5, pady=5)
+
+label_score2 = Label(window, text=player2_score, font=("Arial", 20), bg="lightblue")
+label_score2.grid(row=3, column=2, sticky="nsew", padx=5, pady=5)
 
 window.mainloop()
 
