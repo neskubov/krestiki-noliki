@@ -1,29 +1,43 @@
 import tkinter as tk
+from tkinter import ttk
 
 # Создаем главное окно
 root = tk.Tk()
-root.title("Пример расположения")
-root.geometry("400x300")  # Устанавливаем размер окна
+root.title("Красивая кнопка и меню")
+root.geometry("300x200")
 
-# Создаем виджеты
-for row in range(3):  # Создаем первые 3 строки с пустыми "ячейками"
-    for col in range(3):
-        frame = tk.Frame(root, width=100, height=50, bg="lightgray", borderwidth=1, relief="solid")
-        frame.grid(row=row, column=col, padx=5, pady=5, sticky="nsew")
+# Создаем стиль для кнопки
+style = ttk.Style()
+style.configure("Custom.TButton",
+                font=("Arial", 12, "bold"),
+                foreground="white",
+                background="#4CAF50",
+                padding=10)
+style.map("Custom.TButton",
+          background=[("active", "#45a049"), ("pressed", "#3e8e41")])
 
-# Четвертая строка с меткой и кнопками
-label = tk.Label(root, text="Это метка", bg="yellow")
-label.grid(row=3, column=1, sticky="e", padx=5, pady=5)  # Размещаем метку в 4-й строке, во втором столбце
+# Функция для обработки нажатия кнопки
+def on_button_click():
+    print("Кнопка нажата!")
 
-button1 = tk.Button(root, text="Кнопка 1")
-button1.grid(row=3, column=2, sticky="w", padx=5, pady=5)  # Размещаем кнопку 1 рядом с меткой
+# Создаем красивую кнопку
+button = ttk.Button(root, text="Нажми меня", style="Custom.TButton", command=on_button_click)
+button.pack(pady=20)
 
-button2 = tk.Button(root, text="Кнопка 2")
-button2.grid(row=4, column=1, columnspan=2, pady=5)  # Размещаем кнопку 2 под меткой и кнопкой 1, на 2 столбца
+# Выпадающее меню
+def on_menu_select(event):
+    print(f"Вы выбрали: {combo.get()}")
 
-# Настраиваем размерность сетки
-root.grid_columnconfigure([0, 1, 2], weight=1)  # Растяжение колонок
-root.grid_rowconfigure([0, 1, 2, 3, 4], weight=1)  # Растяжение строк
+# Создаем стиль для выпадающего меню
+style.configure("TCombobox",
+                padding=5,
+                font=("Arial", 12))
 
-# Запускаем главный цикл программы
+options = ["Опция 1", "Опция 2", "Опция 3"]
+combo = ttk.Combobox(root, values=options, style="TCombobox")
+combo.set("Выбери опцию")  # Устанавливаем текст по умолчанию
+combo.bind("<<ComboboxSelected>>", on_menu_select)
+combo.pack(pady=20)
+
+# Запуск главного цикла приложения
 root.mainloop()

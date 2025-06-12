@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import Label, Toplevel, Radiobutton, StringVar, OptionMenu, messagebox
+from tkinter import Label, Toplevel, Radiobutton, StringVar, OptionMenu, messagebox, ttk
 
 window = tk.Tk()
 window.title("Крестики-нолики")
@@ -18,24 +18,23 @@ window.configure(bg="lightblue")
 current_player = "X"
 bg_button = "#9370DB"
 
-def open_selection_window():
+style = ttk.Style()
+style.configure("Custom.TButton",
+                font=("Arial", 8),
+                foreground="black",
+                background="#FFA500")
+style.map("Custom.TButton",
+          background=[("active", "#45a049"), ("pressed", "#3e8e41")])
+
+
+style.configure("TCombobox",
+                padding=5,
+                font=("Arial", 8))
+
+
+def on_menu_select(event):
     global current_player
-
-    # Создаём новое окно
-    selection_window = Toplevel(window)
-    selection_window.geometry(f"310x100+{x}+{y}")
-    selection_window.title("Выберите первого игрока")
-    selection_window.grab_set()
-
-    # Переменная для хранения выбранной опции
-    selected_players = StringVar()
-
-    # Радиокнопки
-    Radiobutton(selection_window, text=f"Начинает игрок Х", value="Х", variable="Х").pack(anchor="w")
-    Radiobutton(selection_window, text=f"Начинает игрок 0", value="0", variable="0").pack(anchor="w")
-
-    # Кнопка подтверждения
-    #Button(selection_window, text="Подтвердить", command=selection_window.destroy()).pack(pady=10)
+    current_player = combo.get()
 
 
 def check_winner():
@@ -52,14 +51,6 @@ def check_winner():
 
    return False
 
-def reset_window():
-    global current_player, counter
-    current_player = "X"
-    counter = 0
-    for i in range(3):
-        for j in range(3):
-            buttons[i][j]["text"] = ""
-            buttons[i][j]["bg"] = "white"
 
 def on_click(row, col):
    global current_player, counter, bg_button
@@ -72,18 +63,28 @@ def on_click(row, col):
    buttons[row][col]['bg'] = bg_button
    buttons[row][col]['text'] = current_player
 
-
    if check_winner():
        messagebox.showinfo("Игра окончена",f"Игрок {current_player} победил!")
        reset_window()
+       return
 
    if counter == 9:
        messagebox.showinfo("Игра окончена", f"Ничья")
        reset_window()
+       return
 
    current_player = "0" if current_player == "X" else "X"
    bg_button = "#9370DB" if bg_button == "#00FFFF" else "#00FFFF"
 
+
+def reset_window():
+    global current_player, counter
+    current_player = combo.get()
+    counter = 0
+    for i in range(3):
+        for j in range(3):
+            buttons[i][j]["text"] = ""
+            buttons[i][j]["bg"] = "white"
 
 counter = 0
 buttons = []
@@ -97,18 +98,17 @@ for i in range(3):
     window.grid_columnconfigure(i, weight=1)
     buttons.append(row)
 
-
-label = Label(window, text="Выберите, кто начинает:")
-label.grid(row=3, column=1, sticky="nsew", ipadx=20)
+label = Label(window, text="Начинает:")
+label.grid(row=3, column=1, sticky="nsew")
 
 options = ["X", "0"]
-selected_option = StringVar(value=options[0])
-select_player = OptionMenu(window, selected_option, *options)
-select_player.grid(row=4, column=1, sticky="nsew",  ipadx=20)
-current_player=selected_option.get()
+combo = ttk.Combobox(window, values=options, style="TCombobox", state="readonly")
+combo.set(options[0])  # Устанавливаем текст по умолчанию
+combo.bind("<<ComboboxSelected>>", on_menu_select)
+combo.grid(row=4, column=1, sticky="nsew")
 
-button = tk.Button(window, text="reset", font=("Arial", 10), command=reset_window)
-button.grid(row=5, column=1, pady=10, ipadx=20, sticky="nsew")
+button = ttk.Button(window, style="Custom.TButton", text="Сброс", command=reset_window)
+button.grid(row=5, column=1, pady=10,  sticky="nsew")
 
 
 window.mainloop()
